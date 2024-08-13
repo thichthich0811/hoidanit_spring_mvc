@@ -25,7 +25,8 @@
                                 <h1 class="mt-4">Manage users</h1>
                                 <ol class="breadcrumb mb-4">
                                     <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-                                    <li class="breadcrumb-item active">Users</li>
+                                    <li class="breadcrumb-item"><a href="/admin/user">User</a></li>
+                                    <li class="breadcrumb-item active">Delete</li>
                                 </ol>
                                 <div class="mt-5">
                                     <div class="row">
