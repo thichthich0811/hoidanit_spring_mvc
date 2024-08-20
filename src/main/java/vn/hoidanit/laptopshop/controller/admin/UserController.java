@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -55,8 +58,20 @@ public class UserController {
     // }
 
     @RequestMapping("/admin/user")
-    public String getUserPage(Model model) {
-        List<User> users = userService.getAllUser();
+    public String getUserPage(Model model,
+            @RequestParam("page") Optional<String> pageOptional) {
+        int page = 1;
+        try {
+            if (pageOptional.isPresent())
+                page = Integer.parseInt(pageOptional.get());
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        Pageable pageable = PageRequest.of(page - 1, 2);
+        Page<User> us = userService.getAllUser(pageable);
+        List<User> users = us.getContent();
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", us.getTotalPages());
         model.addAttribute("users1", users);
         return "admin/user/show";
     }

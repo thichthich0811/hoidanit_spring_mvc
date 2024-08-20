@@ -9,12 +9,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import vn.hoidanit.laptopshop.service.validator.StrongPassword;
 
 @Entity
 @Table(name = "users")
@@ -33,10 +35,11 @@ public class User {
 
     @NotNull
     @Size(min = 3, message = "Password tối thiểu 3 kí tự")
+    // @StrongPassword(message = "Pass bla bla")
     private String fullName;
 
-    @NotNull
-    @NotEmpty(message = "Số điện thoại không thể được bỏ trống")
+    // @NotNull
+    // @NotEmpty(message = "Số điện thoại không thể được bỏ trống")
     private String phone;
     private String address;
     private String avatar;
@@ -47,6 +50,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Order> order;
+
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
 
     public User() {
     }
@@ -127,6 +133,14 @@ public class User {
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", password=" + password + ", fullName=" + fullName + ", phone="
                 + phone + ", address=" + address + ", avatar=" + avatar + "]";
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
 }
