@@ -32,6 +32,7 @@
                 <!-- Template Stylesheet -->
                 <link href="/client/css/style.css" rel="stylesheet">
 
+
             </head>
 
             <body>
@@ -89,7 +90,7 @@
                                                             <div
                                                                 class="p-4 border border-secondary border-top-0 rounded-bottom">
                                                                 <h4 style="font-size: 15px;">
-                                                                    <a href="/product/${product.id}">
+                                                                    <a href="/product/${product.id}" target="_blank">
                                                                         ${product.name}
                                                                     </a>
                                                                 </h4>
