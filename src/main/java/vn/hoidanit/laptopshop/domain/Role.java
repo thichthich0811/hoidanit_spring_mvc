@@ -23,7 +23,7 @@ public class Role implements Serializable {
 
     private String description;
 
-    // one role-> to-> many user
+    // role - one => many - users . ctrl + k . press 's'
     @OneToMany(mappedBy = "role")
     private List<User> users;
 

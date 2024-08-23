@@ -9,6 +9,7 @@ import vn.hoidanit.laptopshop.service.UserService;
 
 @Service
 public class RegisterValidator implements ConstraintValidator<RegisterChecked, RegisterDTO> {
+
     private final UserService userService;
 
     public RegisterValidator(UserService userService) {
@@ -21,7 +22,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked, R
 
         // Check if password fields match
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            context.buildConstraintViolationWithTemplate("ConfirmPassword phải nhập đúng")
+            context.buildConstraintViolationWithTemplate("Passwords nhập không chính xác")
                     .addPropertyNode("confirmPassword")
                     .addConstraintViolation()
                     .disableDefaultConstraintViolation();
@@ -37,6 +38,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked, R
                     .disableDefaultConstraintViolation();
             valid = false;
         }
+
         return valid;
     }
 }

@@ -18,26 +18,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository) {
-        this.orderRepository = orderRepository;
+    public OrderService(
+            OrderRepository orderRepository,
+            OrderDetailRepository orderDetailRepository) {
         this.orderDetailRepository = orderDetailRepository;
+        this.orderRepository = orderRepository;
     }
 
     public Page<Order> fetchAllOrders(Pageable page) {
-        return orderRepository.findAll(page);
+        return this.orderRepository.findAll(page);
     }
 
-    public Optional<Order> fetchOrderById(Long id) {
-        return orderRepository.findById(id);
-    }
-
-    public void updateOrder(Order order) {
-        Optional<Order> orderOptional = this.fetchOrderById(order.getId());
-        if (orderOptional.isPresent()) {
-            Order currentOrder = orderOptional.get();
-            currentOrder.setStatus(order.getStatus());
-            this.orderRepository.save(currentOrder);
-        }
+    public Optional<Order> fetchOrderById(long id) {
+        return this.orderRepository.findById(id);
     }
 
     public void deleteOrderById(long id) {
@@ -54,7 +47,16 @@ public class OrderService {
         this.orderRepository.deleteById(id);
     }
 
-    public List<Order> getOrderByUser(User user) {
+    public void updateOrder(Order order) {
+        Optional<Order> orderOptional = this.fetchOrderById(order.getId());
+        if (orderOptional.isPresent()) {
+            Order currentOrder = orderOptional.get();
+            currentOrder.setStatus(order.getStatus());
+            this.orderRepository.save(currentOrder);
+        }
+    }
+
+    public List<Order> fetchOrderByUser(User user) {
         return this.orderRepository.findByUser(user);
     }
 

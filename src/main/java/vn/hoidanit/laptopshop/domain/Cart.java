@@ -20,21 +20,25 @@ public class Cart implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
+
     @Min(value = 0)
     private int sum;
-    @OneToOne
+
+    // user_id
+    @OneToOne()
     @JoinColumn(name = "user_id")
     private User user;
 
+    // cart_detail_id
     @OneToMany(mappedBy = "cart")
-    private List<CartDetail> CartDetails;
+    List<CartDetail> cartDetails;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -55,11 +59,11 @@ public class Cart implements Serializable {
     }
 
     public List<CartDetail> getCartDetails() {
-        return CartDetails;
+        return cartDetails;
     }
 
     public void setCartDetails(List<CartDetail> cartDetails) {
-        CartDetails = cartDetails;
+        this.cartDetails = cartDetails;
     }
 
 }

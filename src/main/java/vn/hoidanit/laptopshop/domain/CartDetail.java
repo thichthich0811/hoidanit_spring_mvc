@@ -1,5 +1,7 @@
 package vn.hoidanit.laptopshop.domain;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +12,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "cart_detail")
-public class CartDetail {
+public class CartDetail implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -19,10 +23,12 @@ public class CartDetail {
 
     private double price;
 
+    // cart_id: long
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+    // product_id: long
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -33,6 +39,14 @@ public class CartDetail {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
     }
 
     public double getPrice() {
@@ -57,14 +71,6 @@ public class CartDetail {
 
     public void setProduct(Product product) {
         this.product = product;
-    }
-
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(long quantity) {
-        this.quantity = quantity;
     }
 
 }

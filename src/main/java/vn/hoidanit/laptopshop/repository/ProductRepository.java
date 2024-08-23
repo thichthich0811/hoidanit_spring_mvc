@@ -13,6 +13,5 @@ import vn.hoidanit.laptopshop.domain.Product;
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     Page<Product> findAll(Pageable page);
 
-    Page<Product> findAll(Specification<Product> spec, Pageable pageable);
-
+    Page<Product> findAll(Specification<Product> spec, Pageable page);
 }

@@ -14,13 +14,17 @@ import jakarta.servlet.ServletContext;
 public class UploadService {
     private final ServletContext servletContext;
 
-    public UploadService(ServletContext servletContext) {
+    public UploadService(
+            ServletContext servletContext) {
+
         this.servletContext = servletContext;
     }
 
     public String handleSaveUploadFile(MultipartFile file, String targetFolder) {
+        // don't upload file
         if (file.isEmpty())
             return "";
+        // relative path: absolute path
         String rootPath = this.servletContext.getRealPath("/resources/images");
         String finalName = "";
         try {
@@ -29,14 +33,15 @@ public class UploadService {
             File dir = new File(rootPath + File.separator + targetFolder);
             if (!dir.exists())
                 dir.mkdirs();
+
             // Create the file on server
             finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+
             File serverFile = new File(dir.getAbsolutePath() + File.separator + finalName);
-            BufferedOutputStream stream;
+            // uuid
 
-            stream = new BufferedOutputStream(
+            BufferedOutputStream stream = new BufferedOutputStream(
                     new FileOutputStream(serverFile));
-
             stream.write(bytes);
             stream.close();
         } catch (IOException e) {
@@ -44,6 +49,6 @@ public class UploadService {
             e.printStackTrace();
         }
         return finalName;
-
     }
+
 }

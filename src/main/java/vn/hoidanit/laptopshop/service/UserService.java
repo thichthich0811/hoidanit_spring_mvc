@@ -1,13 +1,11 @@
 package vn.hoidanit.laptopshop.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import vn.hoidanit.laptopshop.domain.Product;
 import vn.hoidanit.laptopshop.domain.Role;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.domain.dto.RegisterDTO;
@@ -29,63 +27,61 @@ public class UserService {
             OrderRepository orderRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.orderRepository = orderRepository;
         this.productRepository = productRepository;
-
+        this.orderRepository = orderRepository;
     }
 
-    public Page<User> getAllUser(Pageable page) {
+    public Page<User> getAllUsers(Pageable page) {
         return this.userRepository.findAll(page);
     }
 
-    // public List<User> getAllUserByEmail(String email) {
-    // return this.userRepository.findByEmail(email);
-    // }
-
-    public Optional<User> getById(Long id) {
-        return this.userRepository.findById(id);
+    public List<User> getAllUsersByEmail(String email) {
+        return this.userRepository.findOneByEmail(email);
     }
 
     public User handleSaveUser(User user) {
-        User user1 = this.userRepository.save(user);
-        // System.out.println(user1);
-        return user1;
+        User eric = this.userRepository.save(user);
+        System.out.println(eric);
+        return eric;
     }
 
-    public void deleteUserById(Long id) {
+    public User getUserById(long id) {
+        return this.userRepository.findById(id);
+    }
+
+    public void deleteAUser(long id) {
         this.userRepository.deleteById(id);
     }
 
     public Role getRoleByName(String name) {
-        return roleRepository.findByName(name);
+        return this.roleRepository.findByName(name);
     }
 
     public User registerDTOtoUser(RegisterDTO registerDTO) {
         User user = new User();
-        user.setEmail(registerDTO.getEmail());
         user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
+        user.setEmail(registerDTO.getEmail());
         user.setPassword(registerDTO.getPassword());
         return user;
     }
 
     public boolean checkEmailExist(String email) {
-        return userRepository.existsByEmail(email);
+        return this.userRepository.existsByEmail(email);
     }
 
     public User getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        return user;
+        return this.userRepository.findByEmail(email);
     }
 
-    public Long getCountUser() {
+    public long countUsers() {
         return this.userRepository.count();
     }
 
-    public Long getCountProduct() {
+    public long countProducts() {
         return this.productRepository.count();
     }
 
-    public Long getCountOrder() {
+    public long countOrders() {
         return this.orderRepository.count();
     }
 }

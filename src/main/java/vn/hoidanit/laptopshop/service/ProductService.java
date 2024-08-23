@@ -14,7 +14,6 @@ import vn.hoidanit.laptopshop.domain.CartDetail;
 import vn.hoidanit.laptopshop.domain.Order;
 import vn.hoidanit.laptopshop.domain.OrderDetail;
 import vn.hoidanit.laptopshop.domain.Product;
-import vn.hoidanit.laptopshop.domain.Product_;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.domain.dto.ProductCriteriaDTO;
 import vn.hoidanit.laptopshop.repository.CartDetailRepository;
@@ -33,7 +32,8 @@ public class ProductService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
 
-    public ProductService(ProductRepository productRepository,
+    public ProductService(
+            ProductRepository productRepository,
             CartRepository cartRepository,
             CartDetailRepository cartDetailRepository,
             UserService userService,
@@ -43,75 +43,47 @@ public class ProductService {
         this.cartRepository = cartRepository;
         this.cartDetailRepository = cartDetailRepository;
         this.userService = userService;
-        this.orderDetailRepository = orderDetailRepository;
         this.orderRepository = orderRepository;
+        this.orderDetailRepository = orderDetailRepository;
     }
 
-    public Page<Product> getAllProducts(Pageable page) {
-        return productRepository.findAll(page);
+    public Product createProduct(Product pr) {
+        return this.productRepository.save(pr);
     }
 
-    public Page<Product> getAllProductsWithSpec(Pageable page, ProductCriteriaDTO productCriteriaDTO) {
-        Specification<Product> combinedSpec = Specification.where(null);
-        if (productCriteriaDTO.getFactory() == null
-                && productCriteriaDTO.getTarget() == null
+    public Page<Product> fetchProducts(Pageable page) {
+        return this.productRepository.findAll(page);
+    }
+
+    public Page<Product> fetchProductsWithSpec(Pageable page, ProductCriteriaDTO productCriteriaDTO) {
+        if (productCriteriaDTO.getTarget() == null
+                && productCriteriaDTO.getFactory() == null
                 && productCriteriaDTO.getPrice() == null) {
-            return productRepository.findAll(page);
+            return this.productRepository.findAll(page);
+        }
+
+        Specification<Product> combinedSpec = Specification.where(null);
+
+        if (productCriteriaDTO.getTarget() != null && productCriteriaDTO.getTarget().isPresent()) {
+            Specification<Product> currentSpecs = ProductSpecs.matchListTarget(productCriteriaDTO.getTarget().get());
+            combinedSpec = combinedSpec.and(currentSpecs);
         }
         if (productCriteriaDTO.getFactory() != null && productCriteriaDTO.getFactory().isPresent()) {
-            Specification<Product> spec = ProductSpecs.matchListFactory(productCriteriaDTO.getFactory().get());
-            combinedSpec = combinedSpec.and(spec);
-        }
-        if (productCriteriaDTO.getTarget() != null && productCriteriaDTO.getTarget().isPresent()) {
-            Specification<Product> spec = ProductSpecs.matchListTarget(productCriteriaDTO.getTarget().get());
-            combinedSpec = combinedSpec.and(spec);
-        }
-        if (productCriteriaDTO.getPrice() != null && productCriteriaDTO.getPrice().isPresent()) {
-            Specification<Product> spec = this.buildPriceSpectification(productCriteriaDTO.getPrice().get());
-            combinedSpec = combinedSpec.and(spec);
+            Specification<Product> currentSpecs = ProductSpecs.matchListFactory(productCriteriaDTO.getFactory().get());
+            combinedSpec = combinedSpec.and(currentSpecs);
         }
 
-        return productRepository.findAll(combinedSpec, page);
+        if (productCriteriaDTO.getPrice() != null && productCriteriaDTO.getPrice().isPresent()) {
+            Specification<Product> currentSpecs = this.buildPriceSpecification(productCriteriaDTO.getPrice().get());
+            combinedSpec = combinedSpec.and(currentSpecs);
+        }
+
+        return this.productRepository.findAll(combinedSpec, page);
     }
 
-    // case 1:
-    // public Page<Product> getAllProductsWithSpec(Pageable page, double min) {
-    // return productRepository.findAll(ProductSpecs.minPrice(min), page);
-    // }
-
-    // case 2:
-    // public Page<Product> getAllProductsWithSpec(Pageable page, double max) {
-    // return productRepository.findAll(ProductSpecs.maxPrice(max), page);
-    // }
-
-    // case 3:
-    // public Page<Product> getAllProductsWithSpec(Pageable page, String factory) {
-    // return productRepository.findAll(ProductSpecs.matchFactory(factory), page);
-    // }
-
-    // case 4:
-    // public Page<Product> getAllProductsWithSpec(Pageable page, List<String>
-    // factory) {
-    // return productRepository.findAll(ProductSpecs.matchListFactory(factory),
-    // page);
-    // }
-
-    // case 5
-    // public Page<Product> getAllProductsWithSpec(Pageable page, String price) {
-
-    // if (price.equals("10-toi-15-trieu")) {
-    // return productRepository.findAll(ProductSpecs.priceBetween((double) 10000000,
-    // (double) 15000000), page);
-    // } else if (price.equals("15-toi-30-trieu")) {
-    // return productRepository.findAll(ProductSpecs.priceBetween((double) 15000000,
-    // (double) 30000000), page);
-    // }
-    // return getAllProducts(page);
-    // }
-
     // case 6
-    public Specification<Product> buildPriceSpectification(List<String> price) {
-        Specification<Product> combinedSpec = Specification.where(null);
+    public Specification<Product> buildPriceSpecification(List<String> price) {
+        Specification<Product> combinedSpec = Specification.where(null); // disconjunction
         for (String p : price) {
             double min = 0;
             double max = 0;
@@ -119,8 +91,8 @@ public class ProductService {
             // Set the appropriate min and max based on the price range string
             switch (p) {
                 case "duoi-10-trieu":
-                    max = 10000000;
                     min = 1;
+                    max = 10000000;
                     break;
                 case "10-15-trieu":
                     min = 10000000;
@@ -132,9 +104,8 @@ public class ProductService {
                     break;
                 case "tren-20-trieu":
                     min = 20000000;
-                    max = 300000000;
+                    max = 200000000;
                     break;
-                // Add more cases as needed
             }
 
             if (min != 0 && max != 0) {
@@ -142,22 +113,20 @@ public class ProductService {
                 combinedSpec = combinedSpec.or(rangeSpec);
             }
         }
+
         return combinedSpec;
     }
 
-    public Product handleSaveProduct(Product product) {
-        return productRepository.save(product);
+    public Optional<Product> fetchProductById(long id) {
+        return this.productRepository.findById(id);
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
-    }
-
-    public void deleteProductById(Long id) {
+    public void deleteProduct(long id) {
         this.productRepository.deleteById(id);
     }
 
-    public void handleAddProductToCart(String email, Long productId, HttpSession session, Long quantity) {
+    public void handleAddProductToCart(String email, long productId, HttpSession session, long quantity) {
+
         User user = this.userService.getUserByEmail(email);
         if (user != null) {
             // check user đã có Cart chưa ? nếu chưa -> tạo mới
@@ -201,6 +170,7 @@ public class ProductService {
                 }
 
             }
+
         }
     }
 
@@ -208,28 +178,31 @@ public class ProductService {
         return this.cartRepository.findByUser(user);
     }
 
-    public void handleRemoveCartDetail(Long id, HttpSession session) {
-        // TODO Auto-generated method stub
-        Optional<CartDetail> optional = this.cartDetailRepository.findById(id);
-        if (optional.isPresent()) {
-            CartDetail cartDetail = optional.get();
-            Cart cart = cartDetail.getCart();
-            this.cartDetailRepository.delete(cartDetail);
+    public void handleRemoveCartDetail(long cartDetailId, HttpSession session) {
+        Optional<CartDetail> cartDetailOptional = this.cartDetailRepository.findById(cartDetailId);
+        if (cartDetailOptional.isPresent()) {
+            CartDetail cartDetail = cartDetailOptional.get();
+
+            Cart currentCart = cartDetail.getCart();
+            // delete cart-detail
+            this.cartDetailRepository.deleteById(cartDetailId);
+
             // update cart
-            if (cart.getSum() > 1) {
-                int s = cart.getSum() - 1;
-                cart.setSum(s);
-                this.cartRepository.save(cart);
+            if (currentCart.getSum() > 1) {
+                // update current cart
+                int s = currentCart.getSum() - 1;
+                currentCart.setSum(s);
                 session.setAttribute("sum", s);
+                this.cartRepository.save(currentCart);
             } else {
-                this.cartRepository.delete(cart);
+                // delete cart (sum = 1)
+                this.cartRepository.deleteById(currentCart.getId());
                 session.setAttribute("sum", 0);
             }
         }
     }
 
     public void handleUpdateCartBeforeCheckout(List<CartDetail> cartDetails) {
-        // TODO Auto-generated method stub
         for (CartDetail cartDetail : cartDetails) {
             Optional<CartDetail> cdOptional = this.cartDetailRepository.findById(cartDetail.getId());
             if (cdOptional.isPresent()) {
@@ -240,14 +213,17 @@ public class ProductService {
         }
     }
 
-    public void handlePlaceOrder(User user, HttpSession session,
+    public void handlePlaceOrder(
+            User user, HttpSession session,
             String receiverName, String receiverAddress, String receiverPhone) {
 
-        // step 1:get cart by user
+        // step 1: get cart by user
         Cart cart = this.cartRepository.findByUser(user);
         if (cart != null) {
             List<CartDetail> cartDetails = cart.getCartDetails();
+
             if (cartDetails != null) {
+
                 // create order
                 Order order = new Order();
                 order.setUser(user);
@@ -255,32 +231,37 @@ public class ProductService {
                 order.setReceiverAddress(receiverAddress);
                 order.setReceiverPhone(receiverPhone);
                 order.setStatus("PENDING");
+
                 double sum = 0;
                 for (CartDetail cd : cartDetails) {
-                    sum += cd.getPrice() * cd.getQuantity();
+                    sum += cd.getPrice();
                 }
                 order.setTotalPrice(sum);
                 order = this.orderRepository.save(order);
 
                 // create orderDetail
+
                 for (CartDetail cd : cartDetails) {
                     OrderDetail orderDetail = new OrderDetail();
                     orderDetail.setOrder(order);
                     orderDetail.setProduct(cd.getProduct());
-                    orderDetail.setQuantity(cd.getQuantity());
                     orderDetail.setPrice(cd.getPrice());
+                    orderDetail.setQuantity(cd.getQuantity());
+
                     this.orderDetailRepository.save(orderDetail);
                 }
+
                 // step 2: delete cart_detail and cart
                 for (CartDetail cd : cartDetails) {
-                    this.cartDetailRepository.delete(cd);
+                    this.cartDetailRepository.deleteById(cd.getId());
                 }
-                this.cartRepository.delete(cart);
-                // step 3: update session
+
+                this.cartRepository.deleteById(cart.getId());
+
+                // step 3 : update session
                 session.setAttribute("sum", 0);
             }
         }
 
     }
-
 }

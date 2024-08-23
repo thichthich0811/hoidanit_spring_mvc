@@ -1,6 +1,7 @@
 package vn.hoidanit.laptopshop.domain.dto;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 public class ProductCriteriaDTO {
     private Optional<String> page;

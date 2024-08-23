@@ -10,8 +10,9 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
                 <meta name="description" content="Hỏi Dân IT - Dự án laptopshop" />
                 <meta name="author" content="Hỏi Dân IT" />
-                <title>Dashboard - Hỏi Dân IT</title>
+                <title>Detail Product - Hỏi Dân IT</title>
                 <link href="/css/styles.css" rel="stylesheet" />
+
                 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
             </head>
 
@@ -32,7 +33,7 @@
                                     <div class="row">
                                         <div class="col-12 mx-auto">
                                             <div class="d-flex justify-content-between">
-                                                <h3>Product detail with id = ${product.id}</h3>
+                                                <h3>Product detail with id = ${id}</h3>
                                             </div>
 
                                             <hr />

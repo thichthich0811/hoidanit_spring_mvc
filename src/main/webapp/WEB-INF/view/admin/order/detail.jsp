@@ -36,7 +36,7 @@
                                         <div class="row">
                                             <div class="col-12 mx-auto">
                                                 <div class="d-flex justify-content-between">
-                                                    <h3>Order detail with id = ${order.id}</h3>
+                                                    <h3>Order detail with id = ${id}</h3>
                                                 </div>
 
                                                 <hr />

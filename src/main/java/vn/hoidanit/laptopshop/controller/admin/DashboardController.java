@@ -8,6 +8,7 @@ import vn.hoidanit.laptopshop.service.UserService;
 
 @Controller
 public class DashboardController {
+
     private final UserService userService;
 
     public DashboardController(UserService userService) {
@@ -15,11 +16,10 @@ public class DashboardController {
     }
 
     @GetMapping("/admin")
-    public String getDashBoard(Model model) {
-        model.addAttribute("countUsers", this.userService.getCountUser());
-        model.addAttribute("countOrders", this.userService.getCountOrder());
-        model.addAttribute("countProducts", this.userService.getCountProduct());
+    public String getDashboard(Model model) {
+        model.addAttribute("countUsers", this.userService.countUsers());
+        model.addAttribute("countProducts", this.userService.countProducts());
+        model.addAttribute("countOrders", this.userService.countOrders());
         return "admin/dashboard/show";
     }
-
 }
