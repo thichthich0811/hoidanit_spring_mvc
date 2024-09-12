@@ -57,7 +57,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // v6. lamda
         http
                 .authorizeHttpRequests(authorize -> authorize
