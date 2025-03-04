@@ -2,6 +2,7 @@ package vn.hoidanit.laptopshop.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -252,12 +253,11 @@ public class ProductService {
                 }
 
                 // step 2: delete cart_detail and cart
+
                 for (CartDetail cd : cartDetails) {
                     this.cartDetailRepository.deleteById(cd.getId());
                 }
-
                 this.cartRepository.deleteById(cart.getId());
-
                 // step 3 : update session
                 session.setAttribute("sum", 0);
             }
